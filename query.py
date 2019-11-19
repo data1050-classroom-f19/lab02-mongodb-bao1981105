@@ -23,7 +23,7 @@ def query1(minFare, maxFare):
         An array of documents.
     """
     docs = db.taxi.find(
-        # TODO: implement me
+        { "fare_amount": { '$gte': MinFare, '$lte': maxFare} }
     )
 
     result = [doc for doc in docs]
@@ -76,9 +76,13 @@ def query3():
     Returns:
         An array of documents.
     """
-    docs = db.airbnb.aggregate(
-        # TODO: implement me
-    )
+    docs = db.airbnb.aggregate([
+        { '$group': { 
+            '_id': "$neighbourhood_group", 
+            'avg': { '$avg': "$price" } 
+            } 
+        }
+    ])
 
     result = [doc for doc in docs]
     return result
@@ -94,9 +98,14 @@ def query4():
     Returns:
         An array of documents.
     """
-    docs = db.taxi.aggregate(
-        # TODO: implement me
-    )
+    docs = db.taxi.aggregate([
+        {'$group': {  
+            'pickup_hour': {'$hour': "$pickup_datetime" },
+            'ave_fare':{'$avg':"$fare_amount"}
+            'ave_distance': {'$avg':"$pickup_longitude" - "$dropoff_longitude" + "$pickup_latitude" - "$dropoff_latitude"}
+
+        }
+    ])
     result = [doc for doc in docs]
     return result
 
@@ -119,8 +128,31 @@ def query5():
 
 
     """
-    docs = db.airbnb.aggregate(
-        # TODO: implement me
-    )
-    result = [doc for doc in docs]
-    return result
+    docs = db.airbnb.aggregate([
+       {
+           '$geoNear': {
+               'near': {'type': 'Point', 'coordinates': [longitude, latitude]},
+               'distanceField': 'dist.calculated',
+               'maxDistance': 1000,
+               'spherical': False
+           }
+       },
+       {
+           '$project': {
+               '_id': 0,
+               'dist': 1,
+               'name': 1,
+               'neighbourhood': 1,
+               'neighbourhood_group': 1,
+               'price': 1,
+               'room_type': 1
+           }
+       },
+       {
+           '$sort': {'dist': 1}
+       }
+    ])
+
+   result = [doc for doc in docs]
+   return result
+
