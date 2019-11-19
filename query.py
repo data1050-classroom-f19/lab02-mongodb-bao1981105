@@ -102,7 +102,9 @@ def query4():
         {'$group': {  
             'pickup_hour': {'$hour': "$pickup_datetime" },
             'ave_fare':{'$avg':"$fare_amount"}
-            'ave_distance': {'$avg':"$pickup_longitude" - "$dropoff_longitude" + "$pickup_latitude" - "$dropoff_latitude"}
+            'ave_distance': {'$avg':
+            "$add":["$abs":{"$subtract":["$pickup_longitude","$dropoff_longitude"]}, "$abs": {"$subtract":["$pickup_latitude", "$dropoff_latitude"]}]
+            }
 
         }
     ])
