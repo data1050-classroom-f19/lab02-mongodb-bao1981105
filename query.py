@@ -26,11 +26,9 @@ def query1(minFare, maxFare):
         { "fare_amount": { '$gte': minFare, '$lte': maxFare} },
         {
             '_id': 0,
-            'name': 1,
-            'number_of_reviews': 1,
-            'neighbourhood': 1,
-            'price': 1,
-            'location': 1
+            'pickup_longitude': 1,
+            'pickup_latitude': 1,
+            'fare_amount': 1
         }
     )
 
@@ -66,10 +64,13 @@ def query2(textSearch, minReviews):
         },
         {
             '_id': 0,
-            'pickup_longitude': 1,
-            'pickup_latitude': 1,
-            'fare_amount': 1
+            'name': 1,
+            'number_of_reviews': 1,
+            'neighbourhood': 1,
+            'price': 1,
+            'location': 1
         }
+
     )
 
     result = [doc for doc in docs]
