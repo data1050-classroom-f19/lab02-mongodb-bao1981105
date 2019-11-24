@@ -23,7 +23,15 @@ def query1(minFare, maxFare):
         An array of documents.
     """
     docs = db.taxi.find(
-        { "fare_amount": { '$gte': MinFare, '$lte': maxFare} }
+        { "fare_amount": { '$gte': minFare, '$lte': maxFare} },
+        {
+            '_id': 0,
+            'name': 1,
+            'number_of_reviews': 1,
+            'neighbourhood': 1,
+            'price': 1,
+            'location': 1
+        }
     )
 
     result = [doc for doc in docs]
@@ -58,11 +66,9 @@ def query2(textSearch, minReviews):
         },
         {
             '_id': 0,
-            'name': 1,
-            'number_of_reviews': 1,
-            'neighbourhood': 1,
-            'price': 1,
-            'location': 1
+            'pickup_longitude': 1,
+            'pickup_latitude': 1,
+            'fare_amount': 1
         }
     )
 
@@ -109,8 +115,14 @@ def query4():
                         {'$abs':{"$subtract": ["$pickup_latitude", "$dropoff_latitude"]}}
                     ]
                 }
-            }
+            },
+            'count': {'$sum': 1} 
         }
+        },
+        {
+            '$sort': {
+                'ave_fare': -1
+            }
         }
     ])
     result = [doc for doc in docs]
@@ -154,12 +166,10 @@ def query5():
                'price': 1,
                'room_type': 1
            }
-       },
+        },
        {
            '$sort': {'dist': 1}
        }
     ])
-
-   result = [doc for doc in docs]
-   return result
-
+    result = [doc for doc in docs]
+    return result
