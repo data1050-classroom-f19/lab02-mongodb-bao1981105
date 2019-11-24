@@ -99,13 +99,18 @@ def query4():
         An array of documents.
     """
     docs = db.taxi.aggregate([
-        {'$group': {  
-            'pickup_hour': {'$hour': "$pickup_datetime" },
-            'ave_fare':{'$avg':"$fare_amount"}
-            'ave_distance': {'$avg':
-            "$add":["$abs":{"$subtract":["$pickup_longitude","$dropoff_longitude"]}, "$abs": {"$subtract":["$pickup_latitude", "$dropoff_latitude"]}]
+        { '$group': {  
+            '_id': {'$hour': "$pickup_datetime" },
+            'ave_fare': {'$avg':"$fare_amount"},
+            'ave_distance': {
+                '$avg': {
+                    '$add': [
+                        {'$abs':{'$subtract': ["$pickup_longitude", "$dropoff_longitude"]}},
+                        {'$abs':{"$subtract": ["$pickup_latitude", "$dropoff_latitude"]}}
+                    ]
+                }
             }
-
+        }
         }
     ])
     result = [doc for doc in docs]
